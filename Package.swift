@@ -3,23 +3,23 @@
 import PackageDescription
 import Foundation
 
-// If the `OTEL_SWIFT` environment variable is set, `dd-sdk-ios` will be compiled against `OpenTelemetryApi` 
+// If the `OTEL_SWIFT` environment variable is set, `dd-sdk-ios` will be compiled against `OpenTelemetryApi`
 // from https://github.com/open-telemetry/opentelemetry-swift, which includes the full OpenTelemetry SDK.
 // Otherwise, it will use our lightweight mirror from https://github.com/DataDog/opentelemetry-swift-packages.
 //
-// This split is driven by feedback from https://github.com/DataDog/dd-sdk-ios/issues/1877, where 
-// users reported that fetching the full OpenTelemetry SDK significantly increased dependency size. 
+// This split is driven by feedback from https://github.com/DataDog/dd-sdk-ios/issues/1877, where
+// users reported that fetching the full OpenTelemetry SDK significantly increased dependency size.
 //
-// By using this environment variable, `dd-sdk-ios` consumers can choose whether to depend on the entire 
-// OpenTelemetry SDK or just the API. This remains necessary until OpenTelemetry officially separates 
+// By using this environment variable, `dd-sdk-ios` consumers can choose whether to depend on the entire
+// OpenTelemetry SDK or just the API. This remains necessary until OpenTelemetry officially separates
 // the API and SDK packages (see https://github.com/open-telemetry/opentelemetry-swift/issues/486).
 let useOTelSwiftPackage = ProcessInfo.processInfo.environment["OTEL_SWIFT"] != nil
 
-let opentelemetry = useOTelSwiftPackage ? 
+let opentelemetry = useOTelSwiftPackage ?
     (name: "opentelemetry-swift", url: "https://github.com/open-telemetry/opentelemetry-swift.git") :
     (name: "opentelemetry-swift-packages", url: "https://github.com/DataDog/opentelemetry-swift-packages.git")
 
-// `dd-sdk-ios` supports a broader range of platform versions than `OpenTelemetryApi`. 
+// `dd-sdk-ios` supports a broader range of platform versions than `OpenTelemetryApi`.
 // When compiled in `OTEL_SWIFT` mode, we need to adjust the supported platforms accordingly.
 let platforms: [SupportedPlatform] = useOTelSwiftPackage ?
     [.iOS(.v13), .tvOS(.v13), .macOS(.v12), .watchOS(.v7)] :
@@ -74,7 +74,6 @@ let package = Package(
             name: "DatadogCore",
             dependencies: [
                 .target(name: "DatadogInternal"),
-                .target(name: "DatadogPrivate"),
             ],
             path: "DatadogCore",
             sources: ["Sources"],
@@ -93,11 +92,6 @@ let package = Package(
             ],
             path: "DatadogObjc/Sources"
         ),
-        .target(
-            name: "DatadogPrivate",
-            path: "DatadogCore/Private"
-        ),
-
         .target(
             name: "DatadogInternal",
             path: "DatadogInternal/Sources",

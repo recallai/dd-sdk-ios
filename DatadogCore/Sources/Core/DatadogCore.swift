@@ -416,7 +416,6 @@ extension DatadogContextProvider {
         dateProvider: DateProvider,
         serverDateProvider: ServerDateProvider,
         notificationCenter: NotificationCenter,
-        appLaunchHandler: AppLaunchHandling,
         appStateProvider: AppStateProvider
     ) {
         let context = DatadogContext(
@@ -437,7 +436,7 @@ extension DatadogContextProvider {
             sdkInitDate: dateProvider.now,
             device: device,
             nativeSourceOverride: nativeSourceOverride,
-            launchTime: appLaunchHandler.currentValue,
+            launchTime: LaunchTime(launchTime: nil, launchDate: Date.distantFuture, isActivePrewarm: false),
             // this is a placeholder waiting for the `ApplicationStatePublisher`
             // to be initialized on the main thread, this value will be overrided
             // as soon as the subscription is made.
@@ -448,9 +447,6 @@ extension DatadogContextProvider {
 
         subscribe(\.serverTimeOffset, to: ServerOffsetPublisher(provider: serverDateProvider))
 
-        #if !os(macOS)
-        subscribe(\.launchTime, to: LaunchTimePublisher(handler: appLaunchHandler))
-        #endif
 
         subscribe(\.networkConnectionInfo, to: NWPathMonitorPublisher())
 
@@ -528,10 +524,4 @@ extension DatadogCore: Storage {
     }
 }
 #if SPM_BUILD
-import DatadogPrivate
 #endif
-
-internal let registerObjcExceptionHandlerOnce: () -> Void = {
-    ObjcException.rethrow = __dd_private_ObjcExceptionHandler.rethrow
-    return {}
-}()

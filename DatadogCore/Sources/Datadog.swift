@@ -231,7 +231,6 @@ public enum Datadog {
         internal var notificationCenter: NotificationCenter = .default
 
         /// The default app launch handler for tracking application startup time.
-        internal var appLaunchHandler: AppLaunchHandling = AppLaunchHandler.shared
 
         /// The default application state provider for accessing [application state](https://developer.apple.com/documentation/uikit/uiapplication/state).
         internal var appStateProvider: AppStateProvider = DefaultAppStateProvider()
@@ -426,8 +425,6 @@ public enum Datadog {
             throw ProgrammerError(description: "The '\(instanceName)' instance of SDK is already initialized.")
         }
 
-        registerObjcExceptionHandlerOnce()
-
         try isValid(clientToken: configuration.clientToken)
         try isValid(env: configuration.env)
 
@@ -577,7 +574,6 @@ extension DatadogCore {
                 dateProvider: configuration.dateProvider,
                 serverDateProvider: configuration.serverDateProvider,
                 notificationCenter: configuration.notificationCenter,
-                appLaunchHandler: configuration.appLaunchHandler,
                 appStateProvider: configuration.appStateProvider
             ),
             applicationVersion: applicationVersion,

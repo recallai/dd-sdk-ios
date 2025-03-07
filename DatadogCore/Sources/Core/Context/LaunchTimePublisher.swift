@@ -8,7 +8,6 @@ import Foundation
 import DatadogInternal
 
 #if SPM_BUILD
-import DatadogPrivate
 #endif
 
 /// An interface for tracking key timestamps in the app launch sequence, including launch time and activation events.
@@ -26,7 +25,6 @@ internal protocol AppLaunchHandling {
     /// If the application became active before setting the callback, it will not be triggered.
     ///
     /// - Parameter callback: A closure executed upon app activation.
-    func setApplicationDidBecomeActiveCallback(_ callback: @escaping UIApplicationDidBecomeActiveCallback)
 }
 
 internal extension AppLaunchHandling {
@@ -39,42 +37,3 @@ internal extension AppLaunchHandling {
         )
     }
 }
-
-internal typealias AppLaunchHandler = __dd_private_AppLaunchHandler
-
-extension AppLaunchHandler: AppLaunchHandling {
-    var timeToDidBecomeActive: TimeInterval? { launchTime?.doubleValue }
-}
-
-#if !os(macOS)
-
-internal struct LaunchTimePublisher: ContextValuePublisher {
-    private let handler: AppLaunchHandling
-
-    let initialValue: LaunchTime
-
-    init(handler: AppLaunchHandling) {
-        self.initialValue = handler.currentValue
-        self.handler = handler
-    }
-
-    func publish(to receiver: @escaping ContextValueReceiver<LaunchTime>) {
-        let launchDate = handler.launchDate
-        let isActivePrewarm = handler.isActivePrewarm
-
-        handler.setApplicationDidBecomeActiveCallback { launchTime in
-            let value = LaunchTime(
-                launchTime: launchTime,
-                launchDate: launchDate,
-                isActivePrewarm: isActivePrewarm
-            )
-            receiver(value)
-        }
-    }
-
-    func cancel() {
-        handler.setApplicationDidBecomeActiveCallback { _ in }
-    }
-}
-
-#endif
