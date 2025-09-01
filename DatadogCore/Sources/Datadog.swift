@@ -136,6 +136,10 @@ public enum Datadog {
         /// `false` by default.
         public var backgroundTasksEnabled: Bool
 
+        /// Sets additional configuration attributes.
+        /// This can be used to tweak internal features of the SDK.
+        public var additionalConfiguration: [String: Any] = [:]
+
         /// Creates a Datadog SDK Configuration object.
         ///
         /// - Parameters:
@@ -214,10 +218,6 @@ public enum Datadog {
 
         /// Default process information.
         internal var processInfo: ProcessInfo = .processInfo
-
-        /// Sets additional configuration attributes.
-        /// This can be used to tweak internal features of the SDK.
-        internal var additionalConfiguration: [String: Any] = [:]
 
         /// Default date provider used by the SDK and all products.
         internal var dateProvider: DateProvider = SystemDateProvider()
